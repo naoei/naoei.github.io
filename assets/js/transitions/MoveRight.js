@@ -9,7 +9,7 @@ class MoveRight extends Transition {
         anime({
             targets: target,
             duration: this.duration,
-            translateX: '25px',
+            translateX: '-25px',
             easing: this.easing
         });
 
@@ -25,7 +25,7 @@ class MoveRight extends Transition {
         anime({
             targets: target,
             duration: 0,
-            translateX: '-25px',
+            translateX: '25px',
         });
     }
 }
