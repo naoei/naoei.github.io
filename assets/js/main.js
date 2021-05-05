@@ -1,3 +1,7 @@
+import Fade from "./transitions/Fade.js";
+import MoveLeft from "./transitions/MoveLeft.js";
+import MoveRight from "./transitions/MoveRight.js";
+
 (function ($) {
 
     'use strict';
@@ -11,68 +15,30 @@
             transition = 'fade',
             smoothState;
 
+        let defaultTransition = {
+            duration: 250,
+            easing: 'easeInExpo'
+        }
+
         smoothState = $main.smoothState({
+            debug: true,
             onBefore: function($anchor, $container) {
                 var current = $('[data-viewport]').first().data('viewport'),
                     target = $anchor.data('target');
                 current = current ? current : 0;
                 target = target ? target : 0;
                 if (current === target) {
-                    transition = 'fade';
+                    transition = new Fade(defaultTransition);
                 } else if (current < target) {
-                    transition = 'moveright';
+                    transition = new MoveRight(defaultTransition);
                 } else {
-                    transition = 'moveleft';
+                    transition = new MoveLeft(defaultTransition);
                 }
             },
             onStart: {
                 duration: 400,
                 render: function (url, $container) {
-                    switch (transition) {
-                        case 'moveright':
-                            anime({
-                                targets: '.sceneElement',
-                                duration: 250,
-                                translateX: '25px',
-                                easing: 'easeInExpo'
-                            });
-
-                            anime({
-                                targets: '.sceneElement',
-                                duration: 250,
-                                opacity: 0,
-                                easing: 'easeInExpo'
-                            });
-
-                            break;
-
-                        case 'moveleft':
-                            anime({
-                                targets: '.sceneElement',
-                                duration: 250,
-                                translateX: '-25px',
-                                easing: 'easeInExpo'
-                            });
-
-                            anime({
-                                targets: '.sceneElement',
-                                duration: 250,
-                                opacity: 0,
-                                easing: 'easeInExpo'
-                            });
-
-                            break;
-                    
-                        default:
-                            anime({
-                                targets: '.sceneElement',
-                                duration: 250,
-                                opacity: 0,
-                                easing: 'easeInExpo'
-                            });
-                            break;
-                    }
-
+                    transition.moveIn(anime, '.sceneElement');
                     $site.animate({scrollTop: 0});
                 }
             },
@@ -82,28 +48,12 @@
                     $container.html($newContent);
                     anime({
                         targets: '.sceneElement',
-                        duration: 400,
+                        duration: 250,
                         opacity: 1,
                         easing: 'easeOutExpo'
                     });
 
-                    switch (transition) {
-                        case 'moveright':
-                            anime({
-                                targets: '.sceneElement',
-                                duration: 0,
-                                translateX: '-25px',
-                            });
-                            break;
-                    
-                        case 'moveleft':
-                            anime({
-                                targets: '.sceneElement',
-                                duration: 0,
-                                translateX: '25px',
-                            });
-                            break;
-                    }
+                    transition.moveOut(anime, '.sceneElement');
 
                     anime({
                         targets: '.sceneElement',
